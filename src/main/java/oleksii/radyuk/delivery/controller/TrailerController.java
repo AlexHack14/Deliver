@@ -11,6 +11,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/trailer")
+@CrossOrigin
 public class TrailerController {
     @Autowired
     private TrailerService trailerService;

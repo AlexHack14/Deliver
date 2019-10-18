@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Driver Admin</title>
+</head>
+<body>
+<div class="driver">
+    <div class="driver__create_container">
+        <form class="driver__create_form">
+            <input placeholder="Name" class="driver__create_name">
+            <input placeholder="Surname" class="driver__create_surname">
+            <button class="driver__create_submit_button">Create</button>
+        </form>
+    </div>
+    <table class="driver__table">
+        <thead>
+        <tr>
+            <td>ID</td>
+            <td>NAME</td>
+            <td>SURNAME</td>
+            <td>ACTION</td>
+        </tr>
+        </thead>
+        <tbody class="driver__table_body"></tbody>
+    </table>
+</div>
+<script>
+    const API_URL = 'http://localhost:8080';
+    const nameInput = document.querySelector('.driver__create_name');
+    const surnameInput = document.querySelector('.driver__create_surname');
+    const form = document.querySelector('.driver__create_form');
+    const table = document.querySelector('.driver__table_body');
+    const createUpdateBtn = document.querySelector('.driver__create_submit_button');
+
+    let isUpdate = false;
+
+    const setUpdateAction = () => {
+        const updateBtns = document.getElementsByClassName('driver__update_btn');
+
+        for (let btn of updateBtns) {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                const id = e.target.getAttribute('data-id');
+
+                const xhr = new XMLHttpRequest();
+                xhr.open('GET', `${API_URL}/driver/one?id=${id}`);
+                xhr.onload = function() {
+                    if (xhr.status !== 200) {
+                        console.log('error', xhr);
+                    } else {
+                        const driver = JSON.parse(xhr.response);
+                        nameInput.value = driver.name;
+                        surnameInput.value = driver.surname;
+                        localStorage.setItem('updateElementId', id);
+
+                        createUpdateBtn.innerHTML = 'Update';
+                        isUpdate = true;
+                    }
+                };
+
+                xhr.send();
+            });
+        }
+    };
+
+    const setDeleteAction = () => {
+        const deleteBtns = document.getElementsByClassName('driver__delete_btn');
+
+        for (let btn of deleteBtns) {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                const id = e.target.getAttribute('data-id');
+                console.log(id);
+                const xhr = new XMLHttpRequest();
+                xhr.open('DELETE', `${API_URL}/driver?id=${id}`);
+                xhr.send();
+                xhr.onload = () => {
+                    if (xhr.status !== 200) {
+                        console.log('error', xhr);
+                    } else {
+                        console.log('ok', xhr.response);
+                        getRequest();
+                    }
+                }
+            });
+        }
+    };
+
+    //GET
+    const appendDriver = (driver) => {
+        table.innerHTML += `
+            <tr>
+                <td>${driver.id}</td>
+                <td>${driver.name}</td>
+                <td>${driver.surname}</td>
+                <td>
+                    <button data-id="${driver.id}" class="driver__delete_btn">X</button>
+                    <button data-id="${driver.id}" class="driver__update_btn">&#x270F;</button>
+                </td>
+            </tr>
+        `;
+    };
+
+    const getRequest = () => {
+        let xhr = new XMLHttpRequest();
+        xhr.open('GET', `${API_URL}/driver`);
+        xhr.onload = function() {
+            if (xhr.status !== 200) {
+                console.log('error', xhr);
+            } else {
+                table.innerHTML = '';
+                const drivers = JSON.parse(xhr.response);
+                for (let driver of drivers) {
+                    appendDriver(driver);
+                }
+                setDeleteAction();
+                setUpdateAction();
+            }
+        };
+        xhr.send();
+    };
+
+    getRequest();
+
+    //POST
+    const getFormData = () => {
+        return {
+            name: nameInput.value,
+            surname: surnameInput.value
+        }
+    };
+
+    form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        createRequest();
+    });
+
+    const createRequest = () => {
+        const request = getFormData();
+        let xhr = new XMLHttpRequest();
+        if (isUpdate) {
+            xhr.open('PUT', `${API_URL}/driver?id=${localStorage.getItem('updateElementId')}`);
+            xhr.onload = () => {
+                if (xhr.status !== 200) {
+                    console.log('error', xhr);
+                } else {
+                    createUpdateBtn.innerHTML = 'Create';
+                    isUpdate = false;
+                    getRequest();
+                }
+            };
+            form.reset();
+            xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
+            xhr.send(JSON.stringify(request));
+        } else {
+            xhr.open('POST', `${API_URL}/driver`);
+
+            xhr.upload.onload=function(){
+                getRequest();
+            };
+
+            form.reset();
+            xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
+            xhr.send(JSON.stringify(request));
+        }
+    };
+
+
+</script>
+</body>
+</html>
