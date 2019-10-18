@@ -12,4 +12,6 @@ public class TripCriteriaRequest {
     private Long carId;
     private Long trailerId;
     private Date date;
+    private String startDestination;
+    private String endDestination;
 }

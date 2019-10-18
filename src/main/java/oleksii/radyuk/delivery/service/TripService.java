@@ -1,5 +1,6 @@
 package oleksii.radyuk.delivery.service;
 
+import ch.qos.logback.classic.spi.EventArgUtil;
 import oleksii.radyuk.delivery.dto.other.PageResponse;
 import oleksii.radyuk.delivery.dto.other.PaginationRequest;
 import oleksii.radyuk.delivery.dto.trip.TripCriteriaRequest;
@@ -48,8 +49,14 @@ public class TripService {
         );
     }
 
-    public List<TripResponse> findAllByCriteria(TripCriteriaRequest request) {
-        return tripRepository.findAll(new TripSpecification(request)).stream().map(this::tripToTripResponse).collect(Collectors.toList());
+    public PageResponse<TripResponse> findAllByCriteria(PaginationRequest paginationRequest,TripCriteriaRequest request) {
+        TripSpecification tripSpecifications = new TripSpecification(request);
+        Page<Trip> page = tripRepository.findAll(tripSpecifications,paginationRequest.toPageable());
+        return new PageResponse<>(
+                page.getTotalPages(),
+                page.getTotalElements(),
+                page.get().map(this::tripToTripResponse).collect(Collectors.toList())
+        );
     }
 
     public void update(Long id, TripRequest request) {

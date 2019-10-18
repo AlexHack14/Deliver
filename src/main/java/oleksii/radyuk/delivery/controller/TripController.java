@@ -41,7 +41,7 @@ public class TripController {
 
 
     @GetMapping("/find")
-    public List<TripResponse> findAllByCriteria(TripCriteriaRequest request) {
-        return tripService.findAllByCriteria(request);
+    public PageResponse<TripResponse> findAllByCriteria(TripCriteriaRequest request,PaginationRequest paginationRequest) {
+        return tripService.findAllByCriteria(paginationRequest, request);
     }
 }

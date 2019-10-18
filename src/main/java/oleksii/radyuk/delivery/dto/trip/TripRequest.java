@@ -16,6 +16,8 @@ public class TripRequest {
     private int amountDay;
     private double ukraineRange;
     private double europeRange;
+    private String startDestination;
+    private String endDestination;
     @NotNull
     private Long carId;
     @NotNull

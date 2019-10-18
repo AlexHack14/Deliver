@@ -23,6 +23,8 @@ public class TripResponse {
     private int amountDay;
     private double ukraineRange;
     private double europeRange;
+    private String startDestination;
+    private String endDestination;
     @JsonProperty("driver")
     private DriverResponse driverResponse;
     @JsonProperty("car")

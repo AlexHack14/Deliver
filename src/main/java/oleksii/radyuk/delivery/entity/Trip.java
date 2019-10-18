@@ -27,6 +27,8 @@ public class Trip {
     private int amountDay;
     private double ukraineRange;
     private double europeRange;
+    private String startDestination;
+    private String endDestination;
 
     @ManyToOne
     private Driver driver;
