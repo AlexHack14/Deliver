@@ -11,7 +11,6 @@ import javax.validation.constraints.NotNull;
 public class CarRequest {
     private String mark;
     private String model;
-    @NotNull
     private String VIN;
     @NotBlank(message = "Cannot be empty")
     private String carNumber;

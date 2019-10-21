@@ -2,22 +2,21 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Car Admin</title>
+    <title>Trailer Admin</title>
 </head>
 <body>
-<div class="car">
-    <div class="car__create_container">
-        <form class="car__create_form">
-            <input placeholder="Mark" class="car__create_mark">
-            <input placeholder="Model" class="car__create_model">
-            <input placeholder="VIN" class="car__create_VIN">
-            <input placeholder="Car Number" class="car__create_carNumber">
-            <input type="number" placeholder="year" class="car__create_year">
-
-            <button class="car__create_submit_button">Create</button>
+<div class="trailer">
+    <div class="trailer__create_container">
+        <form class="trailer__create_form">
+            <input placeholder="Mark" class="trailer__create_mark">
+            <input placeholder="Model" class="trailer__create_model">
+            <input placeholder="VIN" class="trailer__create_VIN">
+            <input placeholder="Car Number" class="trailer__create_carNumber">
+            <input type="number" placeholder="year" class="trailer__create_year">
+            <button class="trailer__create_submit_button">Create</button>
         </form>
     </div>
-    <table class="car__table">
+    <table class="trailer__table">
         <thead>
         <tr>
             <td>ID</td>
@@ -29,24 +28,24 @@
             <td>ACTION</td>
         </tr>
         </thead>
-        <tbody class="car__table_body"></tbody>
+        <tbody class="trailer__table_body"></tbody>
     </table>
 </div>
 <script>
     const API_URL = 'http://localhost:8080';
-    const markInput = document.querySelector('.car__create_mark');
-    const modelInput = document.querySelector('.car__create_model');
-    const vinInput = document.querySelector('.car__create_VIN');
-    const carNumberInput = document.querySelector('.car__create_carNumber');
-    const yearInput = document.querySelector('.car__create_year');
-    const form = document.querySelector('.car__create_form');
-    const table = document.querySelector('.car__table_body');
-    const createUpdateBtn = document.querySelector('.car__create_submit_button');
+    const markInput = document.querySelector('.trailer__create_mark');
+    const modelInput = document.querySelector('.trailer__create_model');
+    const vinInput = document.querySelector('.trailer__create_VIN');
+    const carNumberInput = document.querySelector('.trailer__create_carNumber');
+    const yearInput = document.querySelector('.trailer__create_year');
+    const form = document.querySelector('.trailer__create_form');
+    const table = document.querySelector('.trailer__table_body');
+    const createUpdateBtn = document.querySelector('.trailer__create_submit_button');
 
     let isUpdate = false;
 
     const setUpdateAction = () => {
-        const updateBtns = document.getElementsByClassName('car__update_btn');
+        const updateBtns = document.getElementsByClassName('trailer__update_btn');
 
         for (let btn of updateBtns) {
             btn.addEventListener('click', (e) => {
@@ -54,19 +53,18 @@
                 const id = e.target.getAttribute('data-id');
 
                 const xhr = new XMLHttpRequest();
-                xhr.open('GET', `${API_URL}/car/one?id=${id}`);
+                xhr.open('GET', `${API_URL}/trailer/one?id=${id}`);
                 xhr.onload = function() {
                     if (xhr.status !== 200) {
                         console.log('error', xhr);
                     } else {
-                        const car = JSON.parse(xhr.response);
-                        markInput.value=car.mark;
-                        modelInput.value=car.model;
-                        vinInput.value=car.vin;
-                        carNumberInput.value=car.carNumber;
-                        yearInput.value=car.year;
+                        const trailer = JSON.parse(xhr.response);
+                        markInput.value = trailer.mark;
+                        modelInput.value = trailer.model;
+                        vinInput.value=trailer.vin;
+                        carNumberInput.value=trailer.carNumber;
+                        yearInput.value=trailer.year;
                         localStorage.setItem('updateElementId', id);
-
 
                         createUpdateBtn.innerHTML = 'Update';
                         isUpdate = true;
@@ -79,7 +77,7 @@
     };
 
     const setDeleteAction = () => {
-        const deleteBtns = document.getElementsByClassName('car__delete_btn');
+        const deleteBtns = document.getElementsByClassName('trailer__delete_btn');
 
         for (let btn of deleteBtns) {
             btn.addEventListener('click', (e) => {
@@ -87,7 +85,7 @@
                 const id = e.target.getAttribute('data-id');
                 console.log(id);
                 const xhr = new XMLHttpRequest();
-                xhr.open('DELETE', `${API_URL}/car?id=${id}`);
+                xhr.open('DELETE', `${API_URL}/trailer?id=${id}`);
                 xhr.send();
                 xhr.onload = () => {
                     if (xhr.status !== 200) {
@@ -102,18 +100,18 @@
     };
 
     //GET
-    const appendCar = (car) => {
+    const appendTrailer = (trailer) => {
         table.innerHTML += `
             <tr>
-                <td>${car.id}</td>
-                <td>${car.model}</td>
-                <td>${car.mark}</td>
-                <td>${car.vin}</td>
-                <td>${car.carNumber}</td>
-                <td>${car.year}</td>
+                <td>${trailer.id}</td>
+                <td>${trailer.mark}</td>
+                <td>${trailer.model}</td>
+                <td>${trailer.vin}</td>
+                <td>${trailer.carNumber}</td>
+                <td>${trailer.year}</td>
                 <td>
-                    <button data-id="${car.id}" class="car__delete_btn">X</button>
-                    <button data-id="${car.id}" class="car__update_btn">&#x270F;</button>
+                    <button data-id="${trailer.id}" class="trailer__delete_btn">X</button>
+                    <button data-id="${trailer.id}" class="trailer__update_btn">&#x270F;</button>
                 </td>
             </tr>
         `;
@@ -121,15 +119,15 @@
 
     const getRequest = () => {
         let xhr = new XMLHttpRequest();
-        xhr.open('GET', `${API_URL}/car`);
+        xhr.open('GET', `${API_URL}/trailer`);
         xhr.onload = function() {
             if (xhr.status !== 200) {
                 console.log('error', xhr);
             } else {
                 table.innerHTML = '';
-                const cars = JSON.parse(xhr.response);
-                for (let car of cars) {
-                    appendCar(car);
+                const trailers = JSON.parse(xhr.response);
+                for (let trailer of trailers) {
+                    appendTrailer(trailer);
                 }
                 setDeleteAction();
                 setUpdateAction();
@@ -145,7 +143,7 @@
         return {
             mark: markInput.value,
             model: modelInput.value,
-            vin: vinInput.value,
+            vin:vinInput.value,
             carNumber:carNumberInput.value,
             year:yearInput.value
         }
@@ -160,7 +158,7 @@
         const request = getFormData();
         let xhr = new XMLHttpRequest();
         if (isUpdate) {
-            xhr.open('PUT', `${API_URL}/car?id=${localStorage.getItem('updateElementId')}`);
+            xhr.open('PUT', `${API_URL}/trailer?id=${localStorage.getItem('updateElementId')}`);
             xhr.onload = () => {
                 if (xhr.status !== 200) {
                     console.log('error', xhr);
@@ -174,10 +172,12 @@
             xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
             xhr.send(JSON.stringify(request));
         } else {
-            xhr.open('POST', `${API_URL}/car`);
+            xhr.open('POST', `${API_URL}/trailer`);
+
             xhr.upload.onload=function(){
                 getRequest();
             };
+
             form.reset();
             xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
             xhr.send(JSON.stringify(request));
