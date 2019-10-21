@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Trip Admin</title>
+</head>
+<body>
+<div class="trip">
+    <div class="trip__create_container">
+        <form class="trip__create_form">
+            <input placeholder="Start Destination" class="trip__create_startDestination">
+            <input placeholder="End Destination" class="trip__create_endDestination">
+            <input type="date" placeholder="Date" class="trip__create_date">
+            <input type="number" placeholder="Fuel Buy" class="trip__create_fuelBuy">
+            <input type="number" placeholder="Fuel Use" class="trip__create_fuelUse">
+            <input type="number" placeholder="Amount Day" class="trip__create_amountDay">
+            <input type="number" placeholder="Ukrainian Range" class="trip__create_ukrainianRange">
+            <input type="number" placeholder="Europe Range" class="trip__create_europeRange">
+            <input type="number" placeholder="Car ID" class="trip__create_carId">
+            <input type="number" placeholder="Trailer ID" class="trip__create_trailerId">
+            <input type="number" placeholder="Driver ID" class="trip__create_driverId">
+
+            <button class="trip__create_submit_button">Create</button>
+        </form>
+    </div>
+    <table class="trip__table">
+        <thead>
+        <tr>
+            <td>ID</td>
+            <td>DATE</td>
+            <td>SALARY UA</td>
+            <td>SALARY EURO</td>
+            <td>SALARY ZL</td>
+            <td>FUEL BUY</td>
+            <td>FUEL USE</td>
+            <td>AMOUNT DAYS</td>
+            <td>UKRAINIAN RANGE</td>
+            <td>EUROPE RANGE</td>
+            <td>START DESTINATION</td>
+            <td>END DESTINATION</td>
+            <td>DRIVER ID</td>
+            <td>CAR ID</td>
+            <td>TRAILER ID</td>
+            <td>ACTION</td>
+        </tr>
+        </thead>
+        <tbody class="trip__table_body"></tbody>
+    </table>
+</div>
+<script>
+    const API_URL = 'http://localhost:8080';
+    const startDestinationInput = document.querySelector('.trip__create_startDestination');
+    const endDestinationInput = document.querySelector('.trip__create_endDestination');
+    const dateInput = document.querySelector('.trip__create_date');
+    const fuelBuyInput = document.querySelector('.trip__create_fuelBuy');
+    const fuelUseInput = document.querySelector('.trip__create_fuelUse');
+    const amountDayInput = document.querySelector('.trip__create_amountDay');
+    const ukrainianRangeInput = document.querySelector('.trip__create_ukrainianRange');
+    const europeRangeInput = document.querySelector('.trip__create_europeRange');
+    const carIdInput = document.querySelector('.trip__create_carId');
+    const trailerIdIdInput = document.querySelector('.trip__create_trailerId');
+    const driverIdIdInput = document.querySelector('.trip__create_driverId');
+    const form = document.querySelector('.trip__create_form');
+    const table = document.querySelector('.trip__table_body');
+    const createUpdateBtn = document.querySelector('.trip__create_submit_button');
+
+    let isUpdate = false;
+
+    const setUpdateAction = () => {
+        const updateBtns = document.getElementsByClassName('trip__update_btn');
+
+        for (let btn of updateBtns) {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                const id = e.target.getAttribute('data-id');
+
+                const xhr = new XMLHttpRequest();
+                xhr.open('GET', `${API_URL}/trip/one?id=${id}`);
+                xhr.onload = function() {
+                    if (xhr.status !== 200) {
+                        console.log('error', xhr);
+                    } else {
+                        const trip = JSON.parse(xhr.response);
+                        startDestinationInput.value=trip.startDestination;
+                        endDestinationInput.value=trip.endDestination;
+                        dateInput.value=trip.date;
+                        fuelBuyInput.value=trip.fuelBuy;
+                        fuelUseInput.value=trip.fuelUse;
+                        amountDayInput.value=trip.amountDay;
+                        ukrainianRangeInput.value=trip.ukraineRange;
+                        europeRangeInput.value=trip.europeRange;
+                        carIdInput.value=trip.car.id;
+                        trailerIdIdInput.value=trip.trailer.id;
+                        driverIdIdInput.value=trip.driver.id;
+
+                        localStorage.setItem('updateElementId', id);
+                        createUpdateBtn.innerHTML = 'Update';
+                        isUpdate = true;
+                    }
+                };
+
+                xhr.send();
+            });
+        }
+    };
+
+    const setDeleteAction = () => {
+        const deleteBtns = document.getElementsByClassName('trip__delete_btn');
+
+        for (let btn of deleteBtns) {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                const id = e.target.getAttribute('data-id');
+                console.log(id);
+                const xhr = new XMLHttpRequest();
+                xhr.open('DELETE', `${API_URL}/trip?id=${id}`);
+                xhr.send();
+                xhr.onload = () => {
+                    if (xhr.status !== 200) {
+                        console.log('error', xhr);
+                    } else {
+                        console.log('ok', xhr.response);
+                        getRequest();
+                    }
+                }
+            });
+        }
+    };
+
+    //GET
+    const appendTrip = (trip) => {
+        table.innerHTML += `
+            <tr>
+                <td>${trip.id}</td>
+                <td>${trip.date}</td>
+                <td>${trip.driverSalaryUa}</td>
+                <td>${trip.driverSalaryEuro}</td>
+                <td>${trip.driverSalaryZl}</td>
+                <td>${trip.fuelBuy}</td>
+                <td>${trip.fuelUse}</td>
+                <td>${trip.amountDay}</td>
+                <td>${trip.ukraineRange}</td>
+                <td>${trip.europeRange}</td>
+                <td>${trip.startDestination}</td>
+                <td>${trip.endDestination}</td>
+                <td>${trip.driver.id}</td>
+                <td>${trip.car.id}</td>
+                <td>${trip.trailer.id}</td>
+                <td>
+                    <button data-id="${trip.id}" class="trip__delete_btn">X</button>
+                    <button data-id="${trip.id}" class="trip__update_btn">&#x270F;</button>
+                </td>
+            </tr>
+        `;
+    };
+
+    const getRequest = () => {
+        let xhr = new XMLHttpRequest();
+        xhr.open('GET', `${API_URL}/trip`);
+        xhr.onload = function() {
+            if (xhr.status !== 200) {
+                console.log('error', xhr);
+            } else {
+                table.innerHTML = '';
+                const trips = JSON.parse(xhr.response);
+                for (let trip of trips) {
+                    appendTrip(trip);
+                }
+                setDeleteAction();
+                setUpdateAction();
+            }
+        };
+        xhr.send();
+    };
+
+    getRequest();
+
+    //POST
+    const getFormData = () => {
+        return {
+            amountDay: amountDayInput.value,
+            startDestination: startDestinationInput.value,
+            endDestination: endDestinationInput.value,
+            date: dateInput.value,
+            europeRange: europeRangeInput.value,
+            ukraineRange: ukrainianRangeInput.value,
+            fuelBuy: fuelBuyInput.value,
+            fuelUse: fuelUseInput.value,
+            carId: carIdInput.value,
+            driverId: driverIdIdInput.value,
+            trailerId: trailerIdIdInput.value
+        }
+    };
+
+    form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        createRequest();
+    });
+
+    const createRequest = () => {
+        const request = getFormData();
+        let xhr = new XMLHttpRequest();
+        if (isUpdate) {
+            xhr.open('PUT', `${API_URL}/trip?id=${localStorage.getItem('updateElementId')}`);
+            xhr.onload = () => {
+                if (xhr.status !== 200) {
+                    console.log('error', xhr);
+                } else {
+                    createUpdateBtn.innerHTML = 'Create';
+                    isUpdate = false;
+                    getRequest();
+                }
+            };
+            form.reset();
+            xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
+            xhr.send(JSON.stringify(request));
+        } else {
+            xhr.open('POST', `${API_URL}/trip`);
+
+            xhr.upload.onload=function(){
+                getRequest();
+            };
+
+            form.reset();
+            xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
+            xhr.send(JSON.stringify(request));
+        }
+    };
+
+
+</script>
+</body>
+</html>

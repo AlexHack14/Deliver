@@ -1,16 +1,18 @@
 package oleksii.radyuk.delivery.dto.trip;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
 import lombok.Setter;
 
 import javax.validation.constraints.NotNull;
-import java.sql.Date;
+import java.time.LocalDate;
 
 
 @Getter
 @Setter
 public class TripRequest {
-    private Date date;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    private LocalDate date;
     private double fuelBuy;
     private double fuelUse;
     private int amountDay;

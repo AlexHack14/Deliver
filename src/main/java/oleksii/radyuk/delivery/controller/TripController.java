@@ -7,9 +7,11 @@ import oleksii.radyuk.delivery.dto.trip.TripRequest;
 import oleksii.radyuk.delivery.dto.trip.TripResponse;
 import oleksii.radyuk.delivery.service.TripService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @RestController
 @RequestMapping("/trip")
@@ -26,8 +28,21 @@ public class TripController {
     }
 
     @GetMapping
+    public List<TripResponse> findAll(
+            @RequestParam(defaultValue = "id") String fieldName,
+            @RequestParam(defaultValue = "ASC") Sort.Direction direction
+    ) {
+        return tripService.findAll(fieldName, direction);
+    }
+
+    @GetMapping("/page")
     public PageResponse<TripResponse> findAll(PaginationRequest paginationRequest) {
         return tripService.findAll(paginationRequest);
+    }
+
+    @GetMapping("/one")
+    public TripResponse findOne(@RequestParam Long id) {
+        return tripService.findOneResponse(id);
     }
 
     @PutMapping

@@ -1,8 +1,9 @@
 package oleksii.radyuk.delivery.service;
 
-import ch.qos.logback.classic.spi.EventArgUtil;
+
 import oleksii.radyuk.delivery.dto.other.PageResponse;
 import oleksii.radyuk.delivery.dto.other.PaginationRequest;
+import oleksii.radyuk.delivery.dto.trailer.TrailerResponse;
 import oleksii.radyuk.delivery.dto.trip.TripCriteriaRequest;
 import oleksii.radyuk.delivery.dto.trip.TripRequest;
 import oleksii.radyuk.delivery.dto.trip.TripResponse;
@@ -14,6 +15,7 @@ import oleksii.radyuk.delivery.repository.TripRepository;
 import oleksii.radyuk.delivery.specification.TripSpecification;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -74,6 +76,10 @@ public class TripService {
                 .orElseThrow(() -> new IllegalArgumentException("Car with id " + id + " not exists"));
     }
 
+    public TripResponse findOneResponse(Long id) {
+        return tripToTripResponse(findOne(id));
+    }
+
     private TripResponse tripToTripResponse(Trip trip) {
         TripResponse tripResponse = new TripResponse();
         tripResponse.setId(trip.getId());
@@ -86,6 +92,8 @@ public class TripService {
         tripResponse.setDriverSalaryEuro(trip.getDriverSalaryEuro());
         tripResponse.setDriverSalaryUa(trip.getDriverSalaryUa());
         tripResponse.setDriverSalaryZl(trip.getDriverSalaryZl());
+        tripResponse.setStartDestination(trip.getStartDestination());
+        tripResponse.setEndDestination(trip.getEndDestination());
         Driver driver=trip.getDriver();
         if (driver!=null){
             tripResponse.setDriverResponse(DriverService.driverToDriverResponse(driver));
@@ -109,11 +117,19 @@ public class TripService {
         trip.setAmountDay(request.getAmountDay());
         trip.setEuropeRange(request.getEuropeRange());
         trip.setUkraineRange(request.getUkraineRange());
-//        trip.setDriverSalary();
+        trip.setDriverSalaryUa(request.getUkraineRange());
+        trip.setDriverSalaryEuro(request.getEuropeRange());
+        trip.setDriverSalaryZl(request.getAmountDay()*100.0);
         trip.setCar(carService.findOne(request.getCarId()));
         trip.setTrailer(trailerService.findOne(request.getTrailerId()));
         trip.setDriver(driverService.findOne(request.getDriverId()));
+        trip.setStartDestination(request.getStartDestination());
+        trip.setEndDestination(request.getEndDestination());
         return trip;
+    }
+    public List<TripResponse> findAll(String fieldName, Sort.Direction direction){
+        List<Trip> all = tripRepository.findAll(Sort.by(direction, fieldName));
+        return all.stream().map(this::tripToTripResponse).collect(Collectors.toList());
     }
 
 
